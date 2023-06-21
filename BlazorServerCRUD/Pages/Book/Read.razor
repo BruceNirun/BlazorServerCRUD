@@ -1,0 +1,60 @@
+﻿@page "/book"
+@page "/books"
+@using BlazorServerCRUD.Interfaces
+@using BlazorServerCRUD.Models.db
+
+<div class="row">
+    <div class="col-lg-3 m-2">
+        <a class="btn btn-outline-success" href="book/create">เพิ่มหนังสือใหม่</a>
+    </div>
+</div>
+
+@if (Books != null && Books.Count > 0)
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ชื่อหนังสือ</th>
+                <th>ประเภท</th>
+                <th>ราคา</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Books)
+            {
+                <tr>
+                    <td>@item.BookName</td>
+                    <td>@item.Category?.CategoryName</td>
+                    <td>@item.BookPrice</td>
+                    <td>
+                        <a class="btn btn-outline-primary" href="book/detail/@item.BookId" role="button"><i class="bi bi-eye"></i>รายละเอียด</a> |
+                        <a class="btn btn-outline-info" href="book/edit/@item.BookId" role="button"><i class="bi bi-pencil-square"></i>แก้ไข</a> |
+                        <a class="btn btn-outline-danger" @onclick="@(e => Delete(item.BookId))"><i class="bi bi-trash"></i>ลบ</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [Inject]
+    protected IBookService BS { get; set; }
+    private List<Book> Books { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Books = await BS.Read();
+    }
+
+    public async Task Delete(int id)
+    {
+        var b = await BS.ReadById(id);
+        if (b != null)
+        {
+            await BS.Detele(b);
+            Books.RemoveAll(x => x.BookId == id);
+        }
+    }
+}

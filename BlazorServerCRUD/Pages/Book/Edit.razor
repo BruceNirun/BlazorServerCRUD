@@ -1,0 +1,35 @@
+﻿@page "/book/edit/{Id}"
+@using BlazorServerCRUD.Interfaces
+@using BlazorServerCRUD.Models.db
+@using BlazorServerCRUD.Services
+
+@code{
+    [Inject]
+    protected IBookService BS { get; set; }
+    [Inject]
+    protected ICategoryService CS { get; set; }
+    [Inject]
+    protected IPublisherService PS { get; set; }
+    [Inject]
+    protected NavigationManager NV { get; set; }
+
+    [Parameter]
+    public int Id { get; set; }
+    public Book b { get; set; }
+
+    private List<Category> Categories { get; set; }
+    private List<Publisher> Publishers { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        b = await BS.ReadById(Id);
+        Categories = await CS.Read();
+        Publishers = await PS.Read();
+    }
+
+    private async void Submit()
+    {
+        await BS.Update(b);
+        NV.NavigateTo("/book");
+    }
+}

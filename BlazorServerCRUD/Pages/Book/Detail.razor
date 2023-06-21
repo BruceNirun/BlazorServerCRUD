@@ -1,0 +1,43 @@
+﻿@page "/book/detail/{Id}"
+@using BlazorServerCRUD.Models.db
+@using BlazorServerCRUD.Interfaces
+@using BlazorServerCRUD.Services
+
+@if (b != null)
+{
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header">
+                <h4>@b.BookName</h4>
+                <span class="badge bg-danger text-light">@b.Category?.CategoryName</span>
+            </div>
+            <div class="card-body">
+                <p class="card-text">
+                    ISBN : @b.Isbn<br />
+                    สำนักพิมพ์ : @b.Publish?.PublishName<br />
+                    ต้นทุน : @b.BookCost<br />
+                    ราคาขาย : @b.BookPrice<br />
+                </p>
+            </div>
+            <div class="card-footer">
+                <a class="btn btn-outline-primary" href="/book">หน้าแรก</a>
+                <a class="btn btn-outline-info" href="/book/edit/@b.BookId"><i class="bi bi-pencil-square"></i>แก้ไข</a>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Inject]
+    protected IBookService BS { get; set; }
+
+    [Parameter]
+    public int Id { get; set; }
+    public Book b { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        b = await BS.ReadById(Id);
+    }
+}
+

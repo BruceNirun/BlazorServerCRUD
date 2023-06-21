@@ -1,0 +1,114 @@
+﻿@page "/book/create"
+@using BlazorServerCRUD.Interfaces
+@using BlazorServerCRUD.Models.db
+@using BlazorServerCRUD.Services
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-3 m-2">
+            <a class="btn btn-outline-info" href="/book">หน้าแรก</a>
+        </div>
+    </div>
+
+    <EditForm Model="@b" OnValidSubmit="@Submit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="BookName" class="control-label">ชื่อหนังสือ</label>
+                        <InputText class="form-control" @bind-Value="b.BookName" />
+                        <ValidationMessage For="@(() => b.BookName)" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Isbn" class="control-label">รหัส ISBN : </label>
+                        <InputText class="form-control" @bind-Value="b.Isbn" />
+                        <ValidationMessage For="@(() => b.Isbn)" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>ประเภท :</label>
+                        <InputSelect @bind-Value="b.CategoryId" class="form-select" >
+                            <option value="0" selected>-----เลือกประเภท-----</option>
+                            @if (Categories != null)
+                        {
+                            @foreach (var c in Categories)
+                            {
+                                <option value="@c.CategoryId">@c.CategoryName</option>
+                            }
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="@(() => b.CategoryId)" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>สำนักพิมพ์ :</label>
+                        <InputSelect @bind-Value="b.PublishId" class="form-select">
+                            <option value="0" selected>-----เลือกประเภท-----</option>
+                        @if (Publishers != null)
+                            {
+                                @foreach (var p in Publishers)
+                                {
+                                    <option value="@p.PublishId">@p.PublishName</option>
+                                }
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => b.PublishId)" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="BookCost" class="control-label">ต้นทุนหนังสือ : </label>
+                        <InputNumber class="form-control" @bind-Value="b.BookCost" />
+                        <ValidationMessage For="@(() => b.BookCost)" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="BookPrice" class="control-label">ราคาหนังสือ : </label>
+                        <InputNumber class="form-control" @bind-Value="b.BookPrice" />
+                        <ValidationMessage For="@(() => b.BookPrice)" />
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <input type="submit" value="บันทึก" class="btn btn-outline-primary" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </EditForm>
+</div>
+
+
+@code{
+    [Inject]
+    protected IBookService BS { get; set; }
+    [Inject]
+    protected ICategoryService CS { get; set; }
+    [Inject]
+    protected IPublisherService PS { get; set; }
+    [Inject]
+    protected NavigationManager NV { get; set; }
+
+    public Book b { get; set; }
+    private List<Category> Categories { get; set; }
+    private List<Publisher> Publishers { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        b = new Book();
+        Categories = await CS.Read();
+        Publishers = await PS.Read();
+    }
+
+    private async void Submit()
+    {
+        if((b.CategoryId != 0 ) || (b.PublishId != 0))
+        {
+            await BS.Create(b);
+            NV.NavigateTo("/book");
+        }
+    }
+}

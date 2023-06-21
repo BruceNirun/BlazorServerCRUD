@@ -1,5 +1,7 @@
 using BlazorServerCRUD.Data;
+using BlazorServerCRUD.Interfaces;
 using BlazorServerCRUD.Models.db;
+using BlazorServerCRUD.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +22,9 @@ namespace BlazorServerCRUD
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor();
             builder.Services.AddSingleton<WeatherForecastService>();
+            builder.Services.AddScoped<IBookService, BookService>();
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
+            builder.Services.AddScoped<IPublisherService, PublisherService>();
 
             var app = builder.Build();
 
@@ -27,16 +32,12 @@ namespace BlazorServerCRUD
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
             app.UseHttpsRedirection();
-
             app.UseStaticFiles();
-
             app.UseRouting();
-
             app.MapBlazorHub();
             app.MapFallbackToPage("/_Host");
 

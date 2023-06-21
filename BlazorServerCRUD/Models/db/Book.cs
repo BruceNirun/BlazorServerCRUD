@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BlazorServerCRUD.Models.db;
 
 public partial class Book
 {
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int BookId { get; set; }
 
     [Required(ErrorMessage = "กรุณากรอกชื่อหนังสือด้วย!!!")]
